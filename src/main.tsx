@@ -1,0 +1,29 @@
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import '@fontsource/baloo-2/latin-400.css'
+import '@fontsource/baloo-2/latin-600.css'
+import '@fontsource/baloo-2/latin-700.css'
+import '@fontsource/baloo-2/vietnamese-400.css'
+import '@fontsource/baloo-2/vietnamese-600.css'
+import '@fontsource/baloo-2/vietnamese-700.css'
+import '@fontsource/nunito/latin-400.css'
+import '@fontsource/nunito/latin-600.css'
+import '@fontsource/nunito/latin-700.css'
+import '@fontsource/nunito/vietnamese-400.css'
+import '@fontsource/nunito/vietnamese-600.css'
+import '@fontsource/nunito/vietnamese-700.css'
+import '../assets/design-tokens.css'
+import './styles.css'
+import App from './App'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js')
+  })
+}

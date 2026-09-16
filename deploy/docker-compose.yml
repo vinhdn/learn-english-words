@@ -1,0 +1,35 @@
+services:
+  web:
+    image: learn-english-words:1.0.0
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: learn-english-words
+    restart: unless-stopped
+    read_only: true
+    user: "101:101"
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /var/cache/nginx:rw,noexec,nosuid,size=16m,mode=1777
+      - /var/run:rw,noexec,nosuid,size=1m,mode=1777
+      - /tmp:rw,noexec,nosuid,size=8m,mode=1777
+    networks:
+      - edge-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=edge-network
+      - traefik.http.services.learn-english-words.loadbalancer.server.port=8080
+      - traefik.http.routers.learn-english-words.rule=Host(`learn.22792.me`)
+      - traefik.http.routers.learn-english-words.entrypoints=websecure
+      - traefik.http.routers.learn-english-words.tls=true
+      - traefik.http.routers.learn-english-words.tls.certresolver=letsencrypt
+      - traefik.http.routers.learn-english-words-http.rule=Host(`learn.22792.me`)
+      - traefik.http.routers.learn-english-words-http.entrypoints=web
+      - traefik.http.routers.learn-english-words-http.middlewares=learn-english-words-https
+      - traefik.http.middlewares.learn-english-words-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.learn-english-words-https.redirectscheme.permanent=true
+
+networks:
+  edge-network:
+    external: true

@@ -1,0 +1,82 @@
+/* === PRIMITIVES === */
+:root {
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --amber-50: #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-500: #f59e0b;
+  --amber-700: #b45309;
+  --pink-50: #fdf2f8;
+  --pink-600: #db2777;
+  --green-50: #f0fdf4;
+  --green-700: #15803d;
+  --red-50: #fef2f2;
+  --red-700: #b91c1c;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-400: #94a3b8;
+  --slate-600: #475569;
+  --slate-900: #0f172a;
+  --white: #ffffff;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.375rem;
+  --radius-xl: 2rem;
+  --radius-full: 9999px;
+  --shadow-sm: 0 2px 0 rgb(15 23 42 / 0.08), 0 6px 16px rgb(37 99 235 / 0.08);
+  --shadow-md: 0 4px 0 rgb(15 23 42 / 0.09), 0 12px 28px rgb(37 99 235 / 0.12);
+  --duration-fast: 150ms;
+  --duration-normal: 220ms;
+}
+
+/* === SEMANTIC === */
+:root {
+  --color-primary: var(--blue-600);
+  --color-primary-hover: var(--blue-700);
+  --color-on-primary: var(--white);
+  --color-secondary: var(--amber-500);
+  --color-on-secondary: var(--slate-900);
+  --color-accent: var(--pink-600);
+  --color-on-accent: var(--white);
+  --color-success: var(--green-700);
+  --color-success-soft: var(--green-50);
+  --color-error: var(--red-700);
+  --color-error-soft: var(--red-50);
+  --color-background: var(--blue-50);
+  --color-surface: var(--white);
+  --color-surface-muted: var(--slate-50);
+  --color-foreground: var(--slate-900);
+  --color-muted-foreground: var(--slate-600);
+  --color-border: var(--slate-200);
+  --color-ring: var(--blue-600);
+  --font-heading: 'Baloo 2', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+/* === COMPONENT === */
+:root {
+  --button-bg: var(--color-primary);
+  --button-fg: var(--color-on-primary);
+  --button-radius: var(--radius-md);
+  --button-min-height: 48px;
+  --card-bg: var(--color-surface);
+  --card-border: var(--color-border);
+  --card-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-sm);
+  --focus-width: 3px;
+  --focus-offset: 3px;
+}

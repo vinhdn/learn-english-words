@@ -1,0 +1,42 @@
+{
+  "theme": "Vườn Từ Vựng — Playful Learning",
+  "primitive": {
+    "color": {
+      "blue500": "#3B82F6",
+      "blue600": "#2563EB",
+      "blue700": "#1D4ED8",
+      "amber500": "#F59E0B",
+      "pink600": "#DB2777",
+      "green700": "#15803D",
+      "red700": "#B91C1C",
+      "sky50": "#EFF6FF",
+      "slate50": "#F8FAFC",
+      "slate200": "#E2E8F0",
+      "slate600": "#475569",
+      "slate900": "#0F172A",
+      "white": "#FFFFFF"
+    },
+    "space": { "1": "4px", "2": "8px", "3": "12px", "4": "16px", "6": "24px", "8": "32px", "12": "48px" },
+    "radius": { "sm": "8px", "md": "14px", "lg": "22px", "full": "9999px" }
+  },
+  "semantic": {
+    "color": {
+      "primary": "{primitive.color.blue600}",
+      "primaryHover": "{primitive.color.blue700}",
+      "secondary": "{primitive.color.amber500}",
+      "accent": "{primitive.color.pink600}",
+      "success": "{primitive.color.green700}",
+      "error": "{primitive.color.red700}",
+      "background": "{primitive.color.sky50}",
+      "surface": "{primitive.color.white}",
+      "foreground": "{primitive.color.slate900}",
+      "mutedForeground": "{primitive.color.slate600}",
+      "border": "{primitive.color.slate200}"
+    }
+  },
+  "component": {
+    "button": { "radius": "{primitive.radius.md}", "minHeight": "48px" },
+    "card": { "radius": "{primitive.radius.lg}", "padding": "{primitive.space.6}" },
+    "focus": { "width": "3px", "offset": "3px" }
+  }
+}

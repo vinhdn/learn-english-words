@@ -1,0 +1,13 @@
+{
+  "name": "Vườn Từ Vựng",
+  "short_name": "Từ Vựng",
+  "description": "Học tiếng Anh 15 phút mỗi ngày cho bé lớp 2",
+  "lang": "vi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EFF6FF",
+  "theme_color": "#2563EB",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
