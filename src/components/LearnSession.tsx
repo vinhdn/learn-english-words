@@ -3,7 +3,8 @@ import { ArrowLeft, ArrowRight, Check, Clock3, Ear, Hand, Lightbulb, Mic2, Spark
 import { WORDS } from '../data/curriculum'
 import { speakEnglish } from '../lib/speech'
 import type { AppSettings, LearningLesson, LearningWeek, LearningWord } from '../types'
-import { TraceBoard } from './TraceBoard'
+import { PronunciationPractice } from './PronunciationPractice'
+import { SpellingBoard } from './SpellingBoard'
 import { WordIllustration } from './WordIllustration'
 
 type Phase = 'warmup' | 'learn' | 'practice' | 'quiz' | 'write' | 'complete'
@@ -33,6 +34,8 @@ export function LearnSession({ week, lesson, words, settings, onRecord, onComple
   const [practiceRunning, setPracticeRunning] = useState(false)
   const [questionIndex, setQuestionIndex] = useState(0)
   const [writeIndex, setWriteIndex] = useState(0)
+  const [writingComplete, setWritingComplete] = useState(false)
+  const [writingCorrect, setWritingCorrect] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [correct, setCorrect] = useState(0)
   const [elapsed, setElapsed] = useState(0)
@@ -140,9 +143,15 @@ export function LearnSession({ week, lesson, words, settings, onRecord, onComple
   }
 
   const nextWritingWord = () => {
-    onRecord(currentWritingWord.id)
-    if (writeIndex < writingWords.length - 1) setWriteIndex((value) => value + 1)
-    else setPhase('complete')
+    if (!writingComplete) return
+    onRecord(currentWritingWord.id, writingCorrect)
+    if (writeIndex < writingWords.length - 1) {
+      setWriteIndex((value) => value + 1)
+      setWritingComplete(false)
+      setWritingCorrect(false)
+    } else {
+      setPhase('complete')
+    }
   }
 
   return (
@@ -218,6 +227,12 @@ export function LearnSession({ week, lesson, words, settings, onRecord, onComple
               <div><strong lang="en">{currentPracticeWord.english}</strong><span lang="en">{currentPracticeWord.sentence}</span></div>
               <button className="sound-button" onClick={() => hear(currentPracticeWord.sentence, `${currentPracticeWord.id}-sentence`)} type="button"><Volume2 aria-hidden="true" /> Nghe câu mẫu</button>
             </div>
+            <PronunciationPractice
+              word={currentPracticeWord.english}
+              ipa={currentPracticeWord.ipa}
+              audioKey={`${currentPracticeWord.id}-word`}
+              speechRate={settings.speechRate}
+            />
             <div className="practice-action-card"><Hand aria-hidden="true" /><div><span>Hành động của con</span><strong>{currentPracticeWord.action}</strong></div></div>
             {practiceSeconds > 0 ? (
               <button className="primary-button large practice-timer-button" onClick={beginPractice} disabled={practiceRunning} type="button">
@@ -267,14 +282,20 @@ export function LearnSession({ week, lesson, words, settings, onRecord, onComple
 
         {phase === 'write' && currentWritingWord && (
           <section className="activity-panel write-panel animate-in" key={currentWritingWord.id} aria-labelledby="write-title">
-            <span className="eyebrow">Viết bằng ngón tay · {writeIndex + 1}/{writingWords.length} · khoảng 2 phút</span>
-            <h1 id="write-title">Nhìn kỹ rồi tô theo</h1>
-            <button className="write-word-sound" onClick={() => hear(currentWritingWord.english, `${currentWritingWord.id}-word`)} type="button">
-              <Volume2 aria-hidden="true" /><strong lang="en">{currentWritingWord.english}</strong><span lang="en">{currentWritingWord.ipa}</span>
+            <span className="eyebrow">Nghe và viết · {writeIndex + 1}/{writingWords.length} · khoảng 2 phút</span>
+            <h1 id="write-title">Con nghe thấy từ nào?</h1>
+            <p className="activity-lead">Bấm nghe, rồi điền từng chữ cái. Đáp án chỉ hiện khi con nhập đủ.</p>
+            <button className="write-word-sound dictation-sound" onClick={() => hear(currentWritingWord.english, `${currentWritingWord.id}-word`)} type="button" aria-label="Nghe từ cần viết">
+              <Volume2 aria-hidden="true" /><span>Nghe từ cần viết</span>
             </button>
-            <TraceBoard word={currentWritingWord.english} />
-            <button className="primary-button" onClick={nextWritingWord} type="button">
-              {writeIndex < writingWords.length - 1 ? 'Từ tiếp theo' : 'Con đã viết xong'} <ArrowRight aria-hidden="true" />
+            <SpellingBoard
+              word={currentWritingWord.english}
+              ipa={currentWritingWord.ipa}
+              onComplete={(isCorrect) => { setWritingComplete(true); setWritingCorrect(isCorrect) }}
+              onReset={() => { setWritingComplete(false); setWritingCorrect(false) }}
+            />
+            <button className="primary-button" onClick={nextWritingWord} disabled={!writingComplete} type="button">
+              {writeIndex < writingWords.length - 1 ? 'Từ tiếp theo' : 'Hoàn thành buổi học'} <ArrowRight aria-hidden="true" />
             </button>
           </section>
         )}

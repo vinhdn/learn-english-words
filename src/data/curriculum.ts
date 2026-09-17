@@ -218,7 +218,7 @@ const lessonTemplates: Pick<LearningLesson, 'title' | 'focus' | 'description' | 
   { title: 'Gặp từ mới A', focus: 'Nhìn · nghe · nói', description: 'Làm quen nhóm từ đầu tiên bằng hình, âm thanh và cụm ngắn.', kind: 'discover' },
   { title: 'Gặp từ mới B', focus: 'Ghép âm · vận động', description: 'Khám phá nhóm từ tiếp theo và gắn mỗi từ với một hành động.', kind: 'discover' },
   { title: 'Đưa từ vào câu', focus: 'Cụm từ · câu ngắn', description: 'Dùng từ trong mẫu câu vừa sức thay vì học nghĩa rời.', kind: 'practice' },
-  { title: 'Tai tinh, tay khéo', focus: 'Nghe chọn · luyện viết', description: 'Phân biệt từ qua âm thanh, sau đó tô và gõ lại từ.', kind: 'practice' },
+  { title: 'Tai tinh, tay khéo', focus: 'Nghe chọn · chính tả', description: 'Phân biệt từ qua âm thanh, sau đó nghe và điền từng chữ cái.', kind: 'practice' },
   { title: 'Ôn vui cuối tuần', focus: 'Ôn cách quãng', description: 'Ôn ưu tiên những từ con chưa chắc, không học dồn.', kind: 'review' },
 ]
 

@@ -317,7 +317,7 @@ function HomePage({ state, week, lesson, lessons, completedLessonIds, sessionWor
             { icon: Sparkles, time: '3 phút', title: 'Khám phá', text: `${sessionWords.length} từ bằng hình, cụm và câu` },
             { icon: Mic2, time: '2 phút', title: 'Nói & làm', text: 'Nói lại và vận động với cả 6 từ' },
             { icon: Volume2, time: '2 phút', title: 'Nghe & chọn', text: '6 câu nghe rồi chọn đúng hình' },
-            { icon: BookOpen, time: '2 phút', title: 'Luyện viết', text: 'Tô chữ và gõ lại 3 từ' },
+            { icon: BookOpen, time: '2 phút', title: 'Nghe & viết', text: 'Nghe chính tả và điền 3 từ' },
           ].map((item, index) => {
             const Icon = item.icon
             return (
