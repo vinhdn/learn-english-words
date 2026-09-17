@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "generatedAt": "2026-09-17T03:13:18.299Z",
+  "voice": "Samantha",
+  "locale": "en-US",
+  "files": 327,
+  "words": 109,
+  "processing": {
+    "rates": {
+      "word": 128,
+      "phrase": 135,
+      "sentence": 138
+    },
+    "leadingSilenceMs": 140,
+    "trailingSilenceMs": 280,
+    "loudness": "-17 LUFS",
+    "truePeak": "-2 dBTP",
+    "sampleRate": 44100,
+    "channels": 1,
+    "bitrate": "64k"
+  }
+}

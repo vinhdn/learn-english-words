@@ -1,4 +1,5 @@
 let activeAudio: HTMLAudioElement | null = null
+const AUDIO_VERSION = '2'
 
 export function canSpeak(): boolean {
   return typeof window !== 'undefined' && ('speechSynthesis' in window || typeof Audio !== 'undefined')
@@ -34,7 +35,7 @@ export function speakEnglish(text: string, rate = 0.78, audioKey?: string): Prom
 
   activeAudio?.pause()
   window.speechSynthesis?.cancel()
-  const audio = new Audio(`/audio/${audioKey}.mp3`)
+  const audio = new Audio(`/audio/${audioKey}.mp3?v=${AUDIO_VERSION}`)
   audio.preload = 'auto'
   activeAudio = audio
 
