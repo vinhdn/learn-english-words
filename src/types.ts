@@ -28,6 +28,18 @@ export interface LearningWord {
   week: number
 }
 
+export interface LearningLesson {
+  id: string
+  week: number
+  order: number
+  title: string
+  focus: string
+  description: string
+  kind: 'discover' | 'practice' | 'review' | 'project'
+  wordIds: string[]
+  durationMinutes: number
+}
+
 export interface LearningWeek {
   week: number
   stage: 1 | 2 | 3 | 4
@@ -51,6 +63,7 @@ export interface SessionRecord {
   id: string
   date: string
   week: number
+  lessonId?: string
   words: number
   correct: number
   durationMinutes: number
@@ -65,6 +78,7 @@ export interface AppSettings {
 
 export interface LearningState {
   selectedWeek: number
+  selectedLessonId?: string
   wordProgress: Record<string, WordProgress>
   sessions: SessionRecord[]
   settings: AppSettings

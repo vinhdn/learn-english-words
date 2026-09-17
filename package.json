@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "audio:generate": "node scripts/generate-audio.mjs",
     "check": "tsc -b --pretty false",
     "preview": "vite preview --host 0.0.0.0"
   },

@@ -1,4 +1,4 @@
-import type { LearningWeek, LearningWord, WordCategory, WordProgress } from '../types'
+import type { LearningLesson, LearningWeek, LearningWord, WordCategory, WordProgress } from '../types'
 
 const w = (
   english: string,
@@ -213,6 +213,79 @@ export const WEEKS: LearningWeek[] = [
   { week: 12, stage: 3, title: 'Thử thách tổng hợp', subtitle: 'Nghe · nói · hành động', goal: 'Kết hợp từ cũ trong câu ngắn và phản xạ tự nhiên.', phonics: 'Ôn các âm bé còn nhầm', topics: ['actions', 'feelings', 'home'], parentTip: 'Chỉ ôn các từ chưa chắc. Từ đã thành thạo dùng trong câu, không hỏi nghĩa rời.' },
   { week: 13, stage: 4, title: 'Con là người kể chuyện', subtitle: 'Mini-project 2–3 câu', goal: 'Tự tin giới thiệu một bức tranh, thú cưng hoặc gia đình.', phonics: 'Đọc trọn câu theo nhịp', topics: ['family', 'animals', 'colors'], parentTip: 'Cho bé vẽ trên giấy rồi luyện: “This is my… It is… I love…”' },
 ]
+
+const lessonTemplates: Pick<LearningLesson, 'title' | 'focus' | 'description' | 'kind'>[] = [
+  { title: 'Gặp từ mới A', focus: 'Nhìn · nghe · nói', description: 'Làm quen nhóm từ đầu tiên bằng hình, âm thanh và cụm ngắn.', kind: 'discover' },
+  { title: 'Gặp từ mới B', focus: 'Ghép âm · vận động', description: 'Khám phá nhóm từ tiếp theo và gắn mỗi từ với một hành động.', kind: 'discover' },
+  { title: 'Đưa từ vào câu', focus: 'Cụm từ · câu ngắn', description: 'Dùng từ trong mẫu câu vừa sức thay vì học nghĩa rời.', kind: 'practice' },
+  { title: 'Tai tinh, tay khéo', focus: 'Nghe chọn · luyện viết', description: 'Phân biệt từ qua âm thanh, sau đó tô và gõ lại từ.', kind: 'practice' },
+  { title: 'Ôn vui cuối tuần', focus: 'Ôn cách quãng', description: 'Ôn ưu tiên những từ con chưa chắc, không học dồn.', kind: 'review' },
+]
+
+function takeCycled<T>(items: T[], start: number, count: number): T[] {
+  if (!items.length) return []
+  return Array.from({ length: Math.min(count, Math.max(items.length, count)) }, (_, index) => items[(start + index) % items.length])
+}
+
+export const LESSONS: LearningLesson[] = WEEKS.flatMap((week) => {
+  const pool = wordsForWeek(week.week)
+  if (week.week === 13) {
+    return lessonTemplates.map((template, index) => ({
+      id: `week-13-lesson-${index + 1}`,
+      week: 13,
+      order: index + 1,
+      title: index < 2 ? `Chọn ý tưởng ${index + 1}` : index === 2 ? 'Xếp câu kể chuyện' : index === 3 ? 'Luyện nói cùng tranh' : 'Con kể chuyện',
+      focus: index === 4 ? 'Mini-project 2–3 câu' : template.focus,
+      description: index === 4 ? 'Giới thiệu bức tranh bằng This is…, It is…, I love…' : template.description,
+      kind: index === 4 ? 'project' : template.kind,
+      wordIds: takeCycled(pool, index * 5, 6).map((word) => word.id),
+      durationMinutes: 15,
+    }))
+  }
+
+  return lessonTemplates.map((template, index) => ({
+    id: `week-${week.week}-lesson-${index + 1}`,
+    week: week.week,
+    order: index + 1,
+    title: template.title,
+    focus: template.focus,
+    description: template.description,
+    kind: template.kind,
+    wordIds: takeCycled(pool, index * 6, 6).map((word) => word.id),
+    durationMinutes: 15,
+  }))
+})
+
+export function lessonsForWeek(week: number): LearningLesson[] {
+  return LESSONS.filter((lesson) => lesson.week === week)
+}
+
+export function nextLessonAfter(finishedLesson: LearningLesson, completedIds: Set<string>): LearningLesson | undefined {
+  const nextInWeek = lessonsForWeek(finishedLesson.week)
+    .find((lesson) => lesson.order > finishedLesson.order && !completedIds.has(lesson.id))
+  if (nextInWeek) return nextInWeek
+
+  for (let week = finishedLesson.week + 1; week <= WEEKS.length; week += 1) {
+    const next = lessonsForWeek(week).find((lesson) => !completedIds.has(lesson.id))
+    if (next) return next
+  }
+  return undefined
+}
+
+export function wordsForLesson(lesson: LearningLesson): LearningWord[] {
+  return lesson.wordIds.map((id) => WORDS.find((word) => word.id === id)).filter((word): word is LearningWord => Boolean(word))
+}
+
+export function sessionWordsForLesson(
+  lesson: LearningLesson,
+  progress: Record<string, WordProgress>,
+  count = 6,
+): LearningWord[] {
+  const lessonWords = lesson.kind === 'review' ? wordsForWeek(lesson.week) : wordsForLesson(lesson)
+  return [...lessonWords]
+    .sort((a, b) => (progress[a.id]?.mastery ?? 0) - (progress[b.id]?.mastery ?? 0))
+    .slice(0, count)
+}
 
 export const CATEGORY_LABELS: Record<WordCategory, string> = {
   phonics: 'Ghép âm', colors: 'Màu sắc', numbers: 'Số đếm', family: 'Gia đình', school: 'Trường học',

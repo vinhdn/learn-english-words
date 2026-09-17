@@ -10,3 +10,8 @@ coverage/
 .vite/
 *.tsbuildinfo
 .deploy/
+
+.agents/
+.claude/
+.kiro/skills/
+skills-lock.json

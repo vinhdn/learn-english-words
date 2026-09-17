@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   BarChart3, BookHeart, BookOpen, CalendarDays, Check, ChevronRight, Clock3, Download,
-  Ear, Heart, Home, Lightbulb, LockKeyhole, Map, Menu, Play, RotateCcw, Search, Settings2,
+  Ear, Heart, Home, Lightbulb, LockKeyhole, Map, Menu, Mic2, Play, RotateCcw, Search, Settings2,
   ShieldCheck, Sparkles, Sprout, Star, Volume2, X,
 } from 'lucide-react'
-import { CATEGORY_LABELS, WEEKS, WORDS, sessionWordsForWeek } from './data/curriculum'
+import { CATEGORY_LABELS, WEEKS, WORDS, lessonsForWeek, nextLessonAfter, sessionWordsForLesson } from './data/curriculum'
+import { AccountPanel, type SyncStatus } from './components/AccountPanel'
 import { LearnSession } from './components/LearnSession'
 import { WordIllustration } from './components/WordIllustration'
+import { ApiError, getCloudProgress, getCurrentUser, saveCloudProgress, type AuthUser } from './lib/api'
 import { speakEnglish } from './lib/speech'
-import { clearState, loadState, makeSessionRecord, saveState, updateWordProgress } from './lib/storage'
-import type { AppPage, LearningState, LearningWord, WordCategory } from './types'
+import { clearState, loadState, makeSessionRecord, mergeLearningStates, saveState, updateWordProgress } from './lib/storage'
+import type { AppPage, LearningLesson, LearningState, LearningWord, WordCategory } from './types'
 
 const NAV_ITEMS: { id: AppPage; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Hôm nay', icon: Home },
@@ -29,14 +31,111 @@ function App() {
   const [state, setState] = useState<LearningState>(loadState)
   const [page, setPage] = useState<AppPage>('home')
   const [inSession, setInSession] = useState(false)
+  const [activeSessionWords, setActiveSessionWords] = useState<LearningWord[]>([])
+  const [activeSessionLesson, setActiveSessionLesson] = useState<LearningLesson | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
+  const cloudVersion = useRef(0)
 
   useEffect(() => saveState(state), [state])
 
+  const hydrateAccount = async (user: AuthUser, localState = state) => {
+    setSyncStatus('loading')
+    try {
+      const remote = await getCloudProgress()
+      cloudVersion.current = remote.version
+      const merged = remote.state ? mergeLearningStates(localState, remote.state) : localState
+      setState(merged)
+      const saved = await saveCloudProgress(merged, remote.version)
+      cloudVersion.current = saved.version
+      setAuthUser(user)
+      setSyncStatus('synced')
+    } catch {
+      setAuthUser(user)
+      setSyncStatus('offline')
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+    void getCurrentUser()
+      .then(async (user) => {
+        if (!active) return
+        if (user) await hydrateAccount(user)
+        else setAuthUser(null)
+      })
+      .catch(() => {
+        if (active) setSyncStatus('offline')
+      })
+      .finally(() => {
+        if (active) setAuthLoading(false)
+      })
+    return () => { active = false }
+    // Run once: state is the local snapshot loaded at startup.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!authUser) return
+    const timer = window.setTimeout(async () => {
+      setSyncStatus('saving')
+      try {
+        const saved = await saveCloudProgress(state, cloudVersion.current)
+        cloudVersion.current = saved.version
+        setSyncStatus('synced')
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 409) {
+          try {
+            const remote = await getCloudProgress()
+            const merged = remote.state ? mergeLearningStates(state, remote.state) : state
+            const saved = await saveCloudProgress(merged, remote.version)
+            cloudVersion.current = saved.version
+            setState(merged)
+            setSyncStatus('synced')
+            return
+          } catch {
+            setSyncStatus('error')
+            return
+          }
+        }
+        setSyncStatus(navigator.onLine ? 'error' : 'offline')
+      }
+    }, 1200)
+    return () => window.clearTimeout(timer)
+  }, [authUser, state])
+
+  const handleAuthenticated = async (user: AuthUser) => {
+    setAuthLoading(true)
+    await hydrateAccount(user)
+    setAuthLoading(false)
+  }
+
+  const handleLoggedOut = () => {
+    setAuthUser(null)
+    cloudVersion.current = 0
+    setSyncStatus('idle')
+  }
+
+  const syncNow = async () => {
+    if (!authUser) return
+    await hydrateAccount(authUser)
+  }
+
   const currentWeek = WEEKS.find((week) => week.week === state.selectedWeek) ?? WEEKS[0]
+  const weekLessons = lessonsForWeek(state.selectedWeek)
+  const completedLessonIds = useMemo(
+    () => new Set(state.sessions.flatMap((session) => session.lessonId ? [session.lessonId] : [])),
+    [state.sessions],
+  )
+  const currentLesson =
+    weekLessons.find((lesson) => lesson.id === state.selectedLessonId && !completedLessonIds.has(lesson.id)) ??
+    weekLessons.find((lesson) => !completedLessonIds.has(lesson.id)) ??
+    weekLessons[weekLessons.length - 1]
   const sessionWords = useMemo(
-    () => sessionWordsForWeek(state.selectedWeek, state.wordProgress),
-    [state.selectedWeek, state.wordProgress],
+    () => sessionWordsForLesson(currentLesson, state.wordProgress),
+    [currentLesson, state.wordProgress],
   )
 
   const recordWord = (wordId: string, result?: boolean) => {
@@ -50,13 +149,30 @@ function App() {
   }
 
   const completeSession = (correct: number, durationSeconds: number) => {
-    setState((previous) => ({
-      ...previous,
-      sessions: [
-        ...previous.sessions,
-        makeSessionRecord(previous.selectedWeek, sessionWords.length, correct, durationSeconds),
-      ].slice(-90),
-    }))
+    const finishedLesson = activeSessionLesson ?? currentLesson
+    setState((previous) => {
+      const completedIds = new Set([
+        ...previous.sessions.flatMap((session) => session.lessonId ? [session.lessonId] : []),
+        finishedLesson.id,
+      ])
+      const nextLesson = nextLessonAfter(finishedLesson, completedIds)
+
+      return {
+        ...previous,
+        selectedWeek: nextLesson?.week ?? finishedLesson.week,
+        selectedLessonId: nextLesson?.id ?? finishedLesson.id,
+        sessions: [
+          ...previous.sessions,
+          makeSessionRecord(
+            finishedLesson.week,
+            finishedLesson.id,
+            activeSessionWords.length,
+            correct,
+            durationSeconds,
+          ),
+        ].slice(-90),
+      }
+    })
   }
 
   const navigate = (next: AppPage) => {
@@ -65,15 +181,32 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (inSession) {
+  const startSession = () => {
+    setActiveSessionWords(sessionWords)
+    setActiveSessionLesson(currentLesson)
+    setInSession(true)
+  }
+
+  const exitSession = () => {
+    setInSession(false)
+    setActiveSessionWords([])
+    setActiveSessionLesson(null)
+  }
+
+  const selectLesson = (lessonId: string) => {
+    setState((previous) => ({ ...previous, selectedLessonId: lessonId }))
+  }
+
+  if (inSession && activeSessionLesson) {
     return (
       <LearnSession
         week={currentWeek}
-        words={sessionWords}
+        lesson={activeSessionLesson}
+        words={activeSessionWords}
         settings={state.settings}
         onRecord={recordWord}
         onComplete={completeSession}
-        onExit={() => setInSession(false)}
+        onExit={exitSession}
       />
     )
   }
@@ -107,10 +240,10 @@ function App() {
       </header>
 
       <main id="main-content" className="main-content">
-        {page === 'home' && <HomePage state={state} week={currentWeek} sessionWords={sessionWords} onStart={() => setInSession(true)} onNavigate={navigate} />}
+        {page === 'home' && <HomePage state={state} week={currentWeek} lesson={currentLesson} lessons={weekLessons} completedLessonIds={completedLessonIds} sessionWords={sessionWords} onSelectLesson={selectLesson} onStart={startSession} onNavigate={navigate} />}
         {page === 'library' && <LibraryPage state={state} />}
-        {page === 'roadmap' && <RoadmapPage state={state} onSelectWeek={(week) => { setState((previous) => ({ ...previous, selectedWeek: week })); navigate('home') }} />}
-        {page === 'parents' && <ParentsPage state={state} setState={setState} />}
+        {page === 'roadmap' && <RoadmapPage state={state} onSelectWeek={(week) => { setState((previous) => ({ ...previous, selectedWeek: week, selectedLessonId: undefined })); navigate('home') }} />}
+        {page === 'parents' && <ParentsPage state={state} setState={setState} authUser={authUser} authLoading={authLoading} syncStatus={syncStatus} onAuthenticated={handleAuthenticated} onLoggedOut={handleLoggedOut} onSyncNow={syncNow} />}
       </main>
 
       <nav className="bottom-nav" aria-label="Điều hướng nhanh">
@@ -123,7 +256,7 @@ function App() {
       <footer className="site-footer">
         <Sprout aria-hidden="true" />
         <span>Học ít một, nhớ lâu hơn.</span>
-        <span className="privacy-note"><LockKeyhole aria-hidden="true" /> Tiến độ chỉ lưu trên thiết bị này.</span>
+        <span className="privacy-note"><LockKeyhole aria-hidden="true" /> Lưu trên máy hoặc đồng bộ bằng tài khoản phụ huynh.</span>
       </footer>
     </div>
   )
@@ -132,12 +265,16 @@ function App() {
 interface HomePageProps {
   state: LearningState
   week: (typeof WEEKS)[number]
+  lesson: LearningLesson
+  lessons: LearningLesson[]
+  completedLessonIds: Set<string>
   sessionWords: LearningWord[]
+  onSelectLesson: (lessonId: string) => void
   onStart: () => void
   onNavigate: (page: AppPage) => void
 }
 
-function HomePage({ state, week, sessionWords, onStart, onNavigate }: HomePageProps) {
+function HomePage({ state, week, lesson, lessons, completedLessonIds, sessionWords, onSelectLesson, onStart, onNavigate }: HomePageProps) {
   const mastered = Object.values(state.wordProgress).filter((progress) => progress.mastery >= 3).length
   const seen = Object.keys(state.wordProgress).length
   const recentSessions = state.sessions.filter((session) => Date.now() - new Date(session.date).getTime() < 7 * 86_400_000)
@@ -151,11 +288,11 @@ function HomePage({ state, week, sessionWords, onStart, onNavigate }: HomePagePr
       <section className="hero-card">
         <div className="hero-copy">
           <span className="eyebrow"><CalendarDays aria-hidden="true" /> Tuần {week.week} · Giai đoạn {week.stage}</span>
-          <h1>Chào {state.settings.childName}!<br /><span>Hôm nay mình gieo 6 từ mới.</span></h1>
-          <p>{week.subtitle}. Một phiên ngắn với nghe, nhìn, nói, vận động và viết.</p>
+          <h1>Chào {state.settings.childName}!<br /><span>Mình học Buổi {lesson.order} nhé.</span></h1>
+          <p><strong>{lesson.title}</strong> · {lesson.description}</p>
           <div className="hero-actions">
             <button className="primary-button large" onClick={onStart} type="button"><Play fill="currentColor" aria-hidden="true" /> Bắt đầu học</button>
-            <span><Clock3 aria-hidden="true" /> Khoảng {state.settings.sessionMinutes} phút</span>
+            <span><Clock3 aria-hidden="true" /> Nội dung khoảng 10–15 phút</span>
           </div>
         </div>
         <div className="hero-garden" aria-hidden="true">
@@ -176,10 +313,11 @@ function HomePage({ state, week, sessionWords, onStart, onNavigate }: HomePagePr
         </div>
         <div className="lesson-route">
           {[
-            { icon: Ear, time: '2 phút', title: 'Khởi động', text: week.phonics },
-            { icon: Sparkles, time: '5 phút', title: 'Khám phá', text: `${sessionWords.length} từ bằng hình và âm thanh` },
-            { icon: Volume2, time: '4 phút', title: 'Nghe & chọn', text: 'Nghe từ rồi chọn đúng hình' },
-            { icon: BookOpen, time: '3 phút', title: 'Luyện viết', text: 'Tô chữ và gõ lại từ' },
+            { icon: Ear, time: '2 phút', title: 'Khởi động', text: '3 lượt nghe và ghép âm' },
+            { icon: Sparkles, time: '3 phút', title: 'Khám phá', text: `${sessionWords.length} từ bằng hình, cụm và câu` },
+            { icon: Mic2, time: '2 phút', title: 'Nói & làm', text: 'Nói lại và vận động với cả 6 từ' },
+            { icon: Volume2, time: '2 phút', title: 'Nghe & chọn', text: '6 câu nghe rồi chọn đúng hình' },
+            { icon: BookOpen, time: '2 phút', title: 'Luyện viết', text: 'Tô chữ và gõ lại 3 từ' },
           ].map((item, index) => {
             const Icon = item.icon
             return (
@@ -193,13 +331,43 @@ function HomePage({ state, week, sessionWords, onStart, onNavigate }: HomePagePr
         </div>
       </section>
 
+      <section className="week-lessons-section" aria-labelledby="week-lessons-title">
+        <div className="section-heading">
+          <div><span className="eyebrow">Chi tiết tuần {week.week}</span><h2 id="week-lessons-title">5 buổi học trong tuần</h2></div>
+          <span className="next-lesson-label"><Sparkles aria-hidden="true" /> Tiếp theo: Buổi {lesson.order}</span>
+        </div>
+        <div className="weekly-lesson-list">
+          {lessons.map((item) => {
+            const completed = completedLessonIds.has(item.id)
+            const active = item.id === lesson.id
+            return (
+              <button
+                key={item.id}
+                className={`lesson-plan-card${active ? ' active' : ''}${completed ? ' completed' : ''}`}
+                onClick={() => onSelectLesson(item.id)}
+                type="button"
+                aria-current={active ? 'step' : undefined}
+              >
+                <span className="lesson-plan-status">{completed ? <Check aria-hidden="true" /> : item.order}</span>
+                <span className="lesson-plan-copy"><small>{completed ? 'Đã học' : active ? 'Bài tiếp theo' : `Buổi ${item.order}`}</small><strong>{item.title}</strong><span>{item.focus}</span></span>
+                <ChevronRight aria-hidden="true" />
+              </button>
+            )
+          })}
+        </div>
+        <div className="selected-lesson-detail">
+          <div><span className="eyebrow">Buổi {lesson.order} · {lesson.durationMinutes} phút</span><h3>{lesson.title}</h3><p>{lesson.description}</p></div>
+          <button className="primary-button" onClick={onStart} type="button"><Play fill="currentColor" aria-hidden="true" /> Học bài này</button>
+        </div>
+      </section>
+
       <section className="preview-section" aria-labelledby="preview-title">
         <div className="section-heading">
           <div><span className="eyebrow">Hạt giống hôm nay</span><h2 id="preview-title">Con sẽ gặp những từ này</h2></div>
         </div>
         <div className="word-preview-row">
           {sessionWords.map((word) => (
-            <button key={word.id} className="preview-word" onClick={() => void speakEnglish(word.english, state.settings.speechRate)} type="button" aria-label={`Nghe từ ${word.english}`}>
+            <button key={word.id} className="preview-word" onClick={() => void speakEnglish(word.english, state.settings.speechRate, `${word.id}-word`)} type="button" aria-label={`Nghe từ ${word.english}`}>
               <WordIllustration word={word} compact />
               <strong lang="en">{word.english}</strong>
               <Volume2 aria-hidden="true" />
@@ -260,7 +428,7 @@ function LibraryPage({ state }: { state: LearningState }) {
                   <h2 lang="en">{word.english}</h2><span className="ipa" lang="en">{word.ipa}</span>
                   <p>{word.vietnamese}</p><small lang="en">{word.phrase}</small>
                 </div>
-                <button className="sound-button icon-only" onClick={() => void speakEnglish(word.english, state.settings.speechRate)} type="button" aria-label={`Nghe từ ${word.english}`}><Volume2 aria-hidden="true" /></button>
+                <button className="sound-button icon-only" onClick={() => void speakEnglish(word.english, state.settings.speechRate, `${word.id}-word`)} type="button" aria-label={`Nghe từ ${word.english}`}><Volume2 aria-hidden="true" /></button>
                 <div className="mastery-status" aria-label={masteryLabel(level)}><span>{[1, 2, 3].map((dot) => <i key={dot} className={dot <= level ? 'filled' : ''} />)}</span><small>{masteryLabel(level)}</small></div>
               </article>
             )
@@ -311,7 +479,25 @@ function RoadmapPage({ state, onSelectWeek }: { state: LearningState; onSelectWe
   )
 }
 
-function ParentsPage({ state, setState }: { state: LearningState; setState: React.Dispatch<React.SetStateAction<LearningState>> }) {
+function ParentsPage({
+  state,
+  setState,
+  authUser,
+  authLoading,
+  syncStatus,
+  onAuthenticated,
+  onLoggedOut,
+  onSyncNow,
+}: {
+  state: LearningState
+  setState: React.Dispatch<React.SetStateAction<LearningState>>
+  authUser: AuthUser | null
+  authLoading: boolean
+  syncStatus: SyncStatus
+  onAuthenticated: (user: AuthUser) => Promise<void>
+  onLoggedOut: () => void
+  onSyncNow: () => Promise<void>
+}) {
   const mastered = Object.values(state.wordProgress).filter((progress) => progress.mastery >= 3).length
   const totalMinutes = state.sessions.reduce((total, session) => total + session.durationMinutes, 0)
   const exportProgress = () => {
@@ -332,8 +518,16 @@ function ParentsPage({ state, setState }: { state: LearningState; setState: Reac
       <header className="page-header">
         <span className="eyebrow"><ShieldCheck aria-hidden="true" /> Góc phụ huynh</span>
         <h1>Đồng hành nhẹ nhàng</h1>
-        <p>Điều chỉnh phiên học và xem tiến độ. Không cần tài khoản, mọi dữ liệu nằm trên thiết bị này.</p>
+        <p>Điều chỉnh phiên học, xem tiến độ và đăng nhập để tiếp tục trên mọi thiết bị. Bé vẫn có thể học không cần tài khoản.</p>
       </header>
+      <AccountPanel
+        user={authUser}
+        loading={authLoading}
+        syncStatus={syncStatus}
+        onAuthenticated={onAuthenticated}
+        onLoggedOut={onLoggedOut}
+        onSyncNow={onSyncNow}
+      />
       <div className="parent-layout">
         <section className="settings-card" aria-labelledby="settings-title">
           <div className="card-heading"><Settings2 aria-hidden="true" /><div><h2 id="settings-title">Cài đặt học</h2><p>Áp dụng ngay cho phiên tiếp theo.</p></div></div>
@@ -341,7 +535,7 @@ function ParentsPage({ state, setState }: { state: LearningState; setState: Reac
           <div className="setting-row"><span><strong>Thời lượng</strong><small>Khuyến nghị 15–20 phút</small></span><div className="segmented-control">{([15, 20] as const).map((minutes) => <button key={minutes} className={state.settings.sessionMinutes === minutes ? 'active' : ''} onClick={() => setState((previous) => ({ ...previous, settings: { ...previous.settings, sessionMinutes: minutes } }))} type="button">{minutes} phút</button>)}</div></div>
           <label className="setting-row"><span><strong>Hiện nghĩa tiếng Việt</strong><small>Có thể tắt để ưu tiên hình và tiếng Anh</small></span><input className="switch-input" type="checkbox" checked={state.settings.showVietnamese} onChange={(event) => setState((previous) => ({ ...previous, settings: { ...previous.settings, showVietnamese: event.target.checked } }))} /></label>
           <label className="setting-row range-row"><span><strong>Tốc độ phát âm</strong><small>Chậm ← → tự nhiên</small></span><input type="range" min="0.65" max="1" step="0.05" value={state.settings.speechRate} onChange={(event) => setState((previous) => ({ ...previous, settings: { ...previous.settings, speechRate: Number(event.target.value) } }))} /></label>
-          <label className="setting-row"><span><strong>Tuần đang học</strong><small>Chọn theo năng lực hiện tại, không theo ngày</small></span><select value={state.selectedWeek} onChange={(event) => setState((previous) => ({ ...previous, selectedWeek: Number(event.target.value) }))}>{WEEKS.map((week) => <option key={week.week} value={week.week}>Tuần {week.week}: {week.title}</option>)}</select></label>
+          <label className="setting-row"><span><strong>Tuần đang học</strong><small>Chọn theo năng lực hiện tại, không theo ngày</small></span><select value={state.selectedWeek} onChange={(event) => setState((previous) => ({ ...previous, selectedWeek: Number(event.target.value), selectedLessonId: undefined }))}>{WEEKS.map((week) => <option key={week.week} value={week.week}>Tuần {week.week}: {week.title}</option>)}</select></label>
         </section>
 
         <aside className="parent-side">
@@ -355,7 +549,7 @@ function ParentsPage({ state, setState }: { state: LearningState; setState: Reac
           </section>
           <section className="data-card">
             <span className="eyebrow"><LockKeyhole aria-hidden="true" /> Dữ liệu & riêng tư</span>
-            <p>Ứng dụng không gửi tên hoặc tiến độ của bé lên máy chủ.</p>
+            <p>Khi chưa đăng nhập, tiến độ chỉ ở thiết bị này. Khi đăng nhập, tiến độ được mã hóa khi truyền và lưu trong tài khoản phụ huynh trên máy chủ riêng.</p>
             <div className="data-actions"><button className="secondary-button" onClick={exportProgress} type="button"><Download aria-hidden="true" /> Xuất tiến độ</button><button className="danger-text-button" onClick={reset} type="button"><RotateCcw aria-hidden="true" /> Đặt lại</button></div>
           </section>
         </aside>

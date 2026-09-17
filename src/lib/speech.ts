@@ -1,10 +1,12 @@
+let activeAudio: HTMLAudioElement | null = null
+
 export function canSpeak(): boolean {
-  return typeof window !== 'undefined' && 'speechSynthesis' in window
+  return typeof window !== 'undefined' && ('speechSynthesis' in window || typeof Audio !== 'undefined')
 }
 
-export function speakEnglish(text: string, rate = 0.78): Promise<boolean> {
+function synthesizeEnglish(text: string, rate: number): Promise<boolean> {
   return new Promise((resolve) => {
-    if (!canSpeak()) {
+    if (!('speechSynthesis' in window)) {
       resolve(false)
       return
     }
@@ -24,5 +26,30 @@ export function speakEnglish(text: string, rate = 0.78): Promise<boolean> {
     utterance.onend = () => resolve(true)
     utterance.onerror = () => resolve(false)
     window.speechSynthesis.speak(utterance)
+  })
+}
+
+export function speakEnglish(text: string, rate = 0.78, audioKey?: string): Promise<boolean> {
+  if (!audioKey || typeof Audio === 'undefined') return synthesizeEnglish(text, rate)
+
+  activeAudio?.pause()
+  window.speechSynthesis?.cancel()
+  const audio = new Audio(`/audio/${audioKey}.mp3`)
+  audio.preload = 'auto'
+  activeAudio = audio
+
+  return new Promise((resolve) => {
+    audio.onended = () => resolve(true)
+    audio.onerror = () => {
+      if (activeAudio === audio) activeAudio = null
+      void synthesizeEnglish(text, rate).then(resolve)
+    }
+    const playback = audio.play()
+    if (playback) {
+      playback.catch(() => {
+        if (activeAudio === audio) activeAudio = null
+        void synthesizeEnglish(text, rate).then(resolve)
+      })
+    }
   })
 }

@@ -1,0 +1,22 @@
+{
+  "name": "learn-english-words-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "check": "node --check index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.3",
+    "better-sqlite3": "13.0.3",
+    "cookie-parser": "1.4.7",
+    "express": "5.1.0",
+    "express-rate-limit": "8.7.0",
+    "helmet": "8.3.0",
+    "zod": "4.6.5"
+  }
+}

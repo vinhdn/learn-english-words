@@ -65,6 +65,7 @@ export function updateWordProgress(
 
 export function makeSessionRecord(
   week: number,
+  lessonId: string,
   words: number,
   correct: number,
   durationSeconds: number,
@@ -73,8 +74,41 @@ export function makeSessionRecord(
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     date: new Date().toISOString(),
     week,
+    lessonId,
     words,
     correct,
     durationMinutes: Math.max(1, Math.round(durationSeconds / 60)),
+  }
+}
+
+
+export function mergeLearningStates(local: LearningState, cloud: LearningState): LearningState {
+  const wordIds = new Set([...Object.keys(cloud.wordProgress), ...Object.keys(local.wordProgress)])
+  const wordProgress = Object.fromEntries([...wordIds].map((id) => {
+    const localWord = local.wordProgress[id]
+    const cloudWord = cloud.wordProgress[id]
+    if (!localWord) return [id, cloudWord]
+    if (!cloudWord) return [id, localWord]
+    const latest = new Date(localWord.lastSeen).getTime() >= new Date(cloudWord.lastSeen).getTime() ? localWord : cloudWord
+    return [id, {
+      seen: Math.max(localWord.seen, cloudWord.seen),
+      attempts: Math.max(localWord.attempts, cloudWord.attempts),
+      correct: Math.max(localWord.correct, cloudWord.correct),
+      mastery: Math.max(localWord.mastery, cloudWord.mastery),
+      lastSeen: latest.lastSeen,
+    }]
+  }))
+
+  const sessions = [...cloud.sessions, ...local.sessions]
+    .filter((session, index, all) => all.findIndex((item) => item.id === session.id) === index)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(-90)
+
+  const localHasActivity = local.sessions.length > 0 || Object.keys(local.wordProgress).length > 0
+  return {
+    ...cloud,
+    ...(localHasActivity ? { selectedWeek: local.selectedWeek, selectedLessonId: local.selectedLessonId, settings: local.settings } : {}),
+    wordProgress,
+    sessions,
   }
 }

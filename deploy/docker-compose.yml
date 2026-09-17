@@ -1,6 +1,29 @@
 services:
+  api:
+    image: learn-english-words-api:1.0.0
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    container_name: learn-english-words-api
+    restart: unless-stopped
+    read_only: true
+    user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DB_PATH: /data/learning.sqlite
+      PUBLIC_ORIGIN: https://learn.22792.me
+    volumes:
+      - learning-data:/data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m,mode=1777
+    networks:
+      - app-network
+
   web:
-    image: learn-english-words:1.0.0
+    image: learn-english-words:1.1.0
     build:
       context: ..
       dockerfile: deploy/Dockerfile
@@ -10,12 +33,16 @@ services:
     user: "101:101"
     security_opt:
       - no-new-privileges:true
+    depends_on:
+      api:
+        condition: service_healthy
     tmpfs:
       - /var/cache/nginx:rw,noexec,nosuid,size=16m,mode=1777
       - /var/run:rw,noexec,nosuid,size=1m,mode=1777
       - /tmp:rw,noexec,nosuid,size=8m,mode=1777
     networks:
       - edge-network
+      - app-network
     labels:
       - traefik.enable=true
       - traefik.docker.network=edge-network
@@ -33,3 +60,9 @@ services:
 networks:
   edge-network:
     external: true
+  app-network:
+    internal: true
+
+volumes:
+  learning-data:
+    name: learn-english-words-data

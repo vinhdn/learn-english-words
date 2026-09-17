@@ -2,3 +2,7 @@
 !dist/**
 !deploy/Dockerfile
 !deploy/nginx.conf
+!server/Dockerfile
+!server/package.json
+!server/package-lock.json
+!server/index.js
