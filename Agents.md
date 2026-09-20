@@ -1,6 +1,7 @@
 ### Nguyên tắc quan trọng khi dạy lại từ vựng cho bé lớp 2
 
-- **Thời lượng hợp lý:** Chỉ nên học **15 – 20 phút mỗi ngày**, duy trì đều đặn thay vì dồn thời gian dài vào cuối tuần.
+- **Tiến độ 12 từ/tuần:** Chia 12 từ trọng tâm thành hai nhóm 6 từ ở hai buổi đầu; các buổi còn lại đưa cùng 12 từ vào câu, nghe, nói, viết và ôn cách quãng. Mỗi phiên vẫn chỉ nên kéo dài **15 – 20 phút**.
+- **Có thể học lại:** Bài đã hoàn thành luôn được phép mở lại. Việc học lại bổ sung lượt luyện tập, không xóa kết quả hay bắt bé học lại từ đầu.
 - **Đa giác quan (VAK):** Học từ qua hình ảnh (Visual), âm thanh bài hát (Auditory), và cử chỉ hành động thực tế (Kinesthetic/TPR), tránh việc bắt bé chép từ vựng lặp đi lặp lại hay học vẹt nghĩa tiếng Việt.
 - **Học theo cụm và câu ngắn:** Thay vì chỉ học từ rời rạc (*apple*), hãy gắn với tính từ hoặc mẫu câu ngắn (*a red apple*, *I like apples*).
 

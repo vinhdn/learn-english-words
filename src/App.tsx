@@ -130,7 +130,7 @@ function App() {
     [state.sessions],
   )
   const currentLesson =
-    weekLessons.find((lesson) => lesson.id === state.selectedLessonId && !completedLessonIds.has(lesson.id)) ??
+    weekLessons.find((lesson) => lesson.id === state.selectedLessonId) ??
     weekLessons.find((lesson) => !completedLessonIds.has(lesson.id)) ??
     weekLessons[weekLessons.length - 1]
   const sessionWords = useMemo(
@@ -151,11 +151,12 @@ function App() {
   const completeSession = (correct: number, durationSeconds: number) => {
     const finishedLesson = activeSessionLesson ?? currentLesson
     setState((previous) => {
+      const wasCompleted = previous.sessions.some((session) => session.lessonId === finishedLesson.id)
       const completedIds = new Set([
         ...previous.sessions.flatMap((session) => session.lessonId ? [session.lessonId] : []),
         finishedLesson.id,
       ])
-      const nextLesson = nextLessonAfter(finishedLesson, completedIds)
+      const nextLesson = wasCompleted ? undefined : nextLessonAfter(finishedLesson, completedIds)
 
       return {
         ...previous,
@@ -282,16 +283,17 @@ function HomePage({ state, week, lesson, lessons, completedLessonIds, sessionWor
   const weekWords = WORDS.filter((word) => word.week === state.selectedWeek)
   const weekMastered = weekWords.filter((word) => (state.wordProgress[word.id]?.mastery ?? 0) >= 3).length
   const weekProgress = weekWords.length ? Math.round((weekMastered / weekWords.length) * 100) : 0
+  const isReplay = completedLessonIds.has(lesson.id)
 
   return (
     <div className="page home-page">
       <section className="hero-card">
         <div className="hero-copy">
           <span className="eyebrow"><CalendarDays aria-hidden="true" /> Tuần {week.week} · Giai đoạn {week.stage}</span>
-          <h1>Chào {state.settings.childName}!<br /><span>Mình học Buổi {lesson.order} nhé.</span></h1>
+          <h1>Chào {state.settings.childName}!<br /><span>{isReplay ? `Mình ôn lại Buổi ${lesson.order} nhé.` : `Mình học Buổi ${lesson.order} nhé.`}</span></h1>
           <p><strong>{lesson.title}</strong> · {lesson.description}</p>
           <div className="hero-actions">
-            <button className="primary-button large" onClick={onStart} type="button"><Play fill="currentColor" aria-hidden="true" /> Bắt đầu học</button>
+            <button className="primary-button large" onClick={onStart} type="button">{isReplay ? <RotateCcw aria-hidden="true" /> : <Play fill="currentColor" aria-hidden="true" />} {isReplay ? 'Học lại bài này' : 'Bắt đầu học'}</button>
             <span><Clock3 aria-hidden="true" /> Nội dung khoảng 10–15 phút</span>
           </div>
         </div>
@@ -333,8 +335,8 @@ function HomePage({ state, week, lesson, lessons, completedLessonIds, sessionWor
 
       <section className="week-lessons-section" aria-labelledby="week-lessons-title">
         <div className="section-heading">
-          <div><span className="eyebrow">Chi tiết tuần {week.week}</span><h2 id="week-lessons-title">5 buổi học trong tuần</h2></div>
-          <span className="next-lesson-label"><Sparkles aria-hidden="true" /> Tiếp theo: Buổi {lesson.order}</span>
+          <div><span className="eyebrow">Chi tiết tuần {week.week} · 12 từ</span><h2 id="week-lessons-title">5 buổi học trong tuần</h2></div>
+          <span className={`next-lesson-label${isReplay ? ' replay' : ''}`}>{isReplay ? <RotateCcw aria-hidden="true" /> : <Sparkles aria-hidden="true" />} {isReplay ? `Đang ôn lại: Buổi ${lesson.order}` : `Tiếp theo: Buổi ${lesson.order}`}</span>
         </div>
         <div className="weekly-lesson-list">
           {lessons.map((item) => {
@@ -349,15 +351,15 @@ function HomePage({ state, week, lesson, lessons, completedLessonIds, sessionWor
                 aria-current={active ? 'step' : undefined}
               >
                 <span className="lesson-plan-status">{completed ? <Check aria-hidden="true" /> : item.order}</span>
-                <span className="lesson-plan-copy"><small>{completed ? 'Đã học' : active ? 'Bài tiếp theo' : `Buổi ${item.order}`}</small><strong>{item.title}</strong><span>{item.focus}</span></span>
-                <ChevronRight aria-hidden="true" />
+                <span className="lesson-plan-copy"><small>{completed ? (active ? 'Đang chọn để học lại' : 'Đã học · Chọn để ôn') : active ? 'Bài tiếp theo' : `Buổi ${item.order}`}</small><strong>{item.title}</strong><span>{item.focus}</span></span>
+                {completed ? <RotateCcw aria-hidden="true" /> : <ChevronRight aria-hidden="true" />}
               </button>
             )
           })}
         </div>
         <div className="selected-lesson-detail">
-          <div><span className="eyebrow">Buổi {lesson.order} · {lesson.durationMinutes} phút</span><h3>{lesson.title}</h3><p>{lesson.description}</p></div>
-          <button className="primary-button" onClick={onStart} type="button"><Play fill="currentColor" aria-hidden="true" /> Học bài này</button>
+          <div><span className="eyebrow">Buổi {lesson.order} · {lesson.durationMinutes} phút{isReplay ? ' · Đã học' : ''}</span><h3>{lesson.title}</h3><p>{isReplay ? 'Con đã học bài này. Mình có thể ôn lại bất cứ lúc nào để nhớ lâu hơn.' : lesson.description}</p></div>
+          <button className="primary-button" onClick={onStart} type="button">{isReplay ? <RotateCcw aria-hidden="true" /> : <Play fill="currentColor" aria-hidden="true" />} {isReplay ? 'Học lại bài này' : 'Học bài này'}</button>
         </div>
       </section>
 
@@ -450,9 +452,9 @@ function RoadmapPage({ state, onSelectWeek }: { state: LearningState; onSelectWe
   return (
     <div className="page roadmap-page">
       <header className="page-header">
-        <span className="eyebrow"><Map aria-hidden="true" /> Lộ trình 3–4 tháng</span>
+        <span className="eyebrow"><Map aria-hidden="true" /> Lộ trình 3–4 tháng · 12 từ mỗi tuần</span>
         <h1>Đi từ nền tảng đến tự tin</h1>
-        <p>Mỗi tuần là một khu vườn nhỏ. Bố mẹ có thể chọn tuần phù hợp với bài bé đang học.</p>
+        <p>Mỗi tuần là một khu vườn 12 từ, chia thành hai nhóm 6 từ vừa sức. Bố mẹ có thể chọn tuần hoặc mở lại bất kỳ bài đã học.</p>
       </header>
       <div className="stage-list">
         {stages.map((stage) => (

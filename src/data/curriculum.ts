@@ -183,7 +183,90 @@ const homeWords: LearningWord[] = [
   w('lamp', '/læmp/', 'cái đèn', 'a bright lamp', 'The lamp is on the desk.', 'l · a · mp → lamp', 'Bật chiếc đèn tưởng tượng.', 'lamp', '#F59E0B', 'home', 3, 11),
 ]
 
-export const WORDS: LearningWord[] = [
+const paceExpansionWords: LearningWord[] = [
+  // Tuần 1: thêm CVC ngắn để đủ hai nhóm, mỗi nhóm 6 từ.
+  w('map', '/mæp/', 'bản đồ', 'a small map', 'This is a map.', 'm · a · p → map', 'Mở hai tay như đang xem bản đồ.', 'map', '#2563EB', 'phonics', 1, 1),
+  w('tap', '/tæp/', 'chạm nhẹ', 'tap the bag', 'I tap the bag.', 't · a · p → tap', 'Chạm nhẹ hai ngón tay vào nhau.', 'tap', '#F59E0B', 'phonics', 1, 1),
+  w('hen', '/hen/', 'gà mái', 'a red hen', 'The hen is red.', 'h · e · n → hen', 'Khép hai tay làm đôi cánh.', 'hen', '#DC2626', 'phonics', 1, 1),
+  w('net', '/net/', 'cái lưới', 'a big net', 'This is a net.', 'n · e · t → net', 'Đan các ngón tay thành chiếc lưới.', 'net', '#0EA5E9', 'phonics', 1, 1),
+  w('jam', '/dʒæm/', 'mứt', 'sweet jam', 'I like jam.', 'j · a · m → jam', 'Giả vờ phết mứt lên bánh mì.', 'jam', '#DB2777', 'phonics', 1, 1),
+  w('van', '/væn/', 'xe tải nhỏ', 'a blue van', 'The van is blue.', 'v · a · n → van', 'Làm động tác lái xe.', 'van', '#16A34A', 'phonics', 1, 1),
+
+  // Tuần 8: mở rộng bộ phận cơ thể.
+  w('arm', '/ɑːrm/', 'cánh tay', 'two arms', 'Raise your arms.', 'a · r · m → arm', 'Giơ hai cánh tay lên.', 'arm', '#F97316', 'body', 2, 8),
+  w('hair', '/her/', 'tóc', 'black hair', 'My hair is black.', 'h · air → hair', 'Chạm nhẹ vào tóc.', 'hair', '#7C3AED', 'body', 2, 8),
+  w('face', '/feɪs/', 'khuôn mặt', 'a happy face', 'This is my face.', 'f · a_e → face', 'Khoanh hai tay quanh khuôn mặt.', 'face', '#DB2777', 'body', 2, 8),
+
+  // Tuần 9: thêm động từ hành động quen thuộc.
+  w('dance', '/dæns/', 'nhảy múa', 'dance together', 'I can dance.', 'd · a_e · nce → dance', 'Nhún chân và xoay hai tay.', 'dance', '#DB2777', 'actions', 3, 9),
+  w('sing', '/sɪŋ/', 'hát', 'sing a song', 'I can sing.', 's · i · ng → sing', 'Đưa tay làm chiếc micrô.', 'sing', '#7C3AED', 'actions', 3, 9),
+  w('write', '/raɪt/', 'viết', 'write my name', 'I can write.', 'wr · i_e → write', 'Dùng ngón tay viết trên không.', 'write', '#2563EB', 'actions', 3, 9),
+  w('clap', '/klæp/', 'vỗ tay', 'clap your hands', 'I can clap.', 'cl · a · p → clap', 'Vỗ tay hai lần.', 'clap', '#F59E0B', 'actions', 3, 9),
+
+  // Tuần 10: thêm từ diễn đạt cảm xúc.
+  w('excited', '/ɪkˈsaɪtɪd/', 'hào hứng', 'very excited', 'I am excited.', 'ex · ci · ted', 'Mở to mắt và giơ hai tay.', 'excited', '#F97316', 'feelings', 3, 10),
+  w('scared', '/skerd/', 'sợ', 'a little scared', 'I am scared.', 'sc · are · d', 'Ôm nhẹ hai vai.', 'scared', '#7C3AED', 'feelings', 3, 10),
+  w('calm', '/kɑːm/', 'bình tĩnh', 'feel calm', 'I am calm.', 'c · al · m → calm', 'Đặt tay lên bụng và thở chậm.', 'calm', '#0EA5E9', 'feelings', 3, 10),
+  w('proud', '/praʊd/', 'tự hào', 'feel proud', 'I am proud.', 'pr · ou · d → proud', 'Đứng thẳng và mỉm cười.', 'proud', '#F59E0B', 'feelings', 3, 10),
+  w('bored', '/bɔːrd/', 'chán', 'a little bored', 'I am bored.', 'b · ore · d → bored', 'Chống cằm bằng một tay.', 'bored', '#64748B', 'feelings', 3, 10),
+  w('surprised', '/sərˈpraɪzd/', 'ngạc nhiên', 'very surprised', 'I am surprised.', 'sur · prised', 'Mở tròn mắt và miệng.', 'surprised', '#DB2777', 'feelings', 3, 10),
+
+  // Tuần 11: thêm đồ vật và khu vực trong nhà.
+  w('living room', '/ˈlɪvɪŋ ruːm/', 'phòng khách', 'in the living room', 'We sit in the living room.', 'living + room', 'Dang tay chỉ quanh phòng khách.', 'living-room', '#16A34A', 'home', 3, 11),
+  w('sofa', '/ˈsoʊfə/', 'ghế sofa', 'a soft sofa', 'The sofa is soft.', 'so · fa', 'Giả vờ ngồi xuống ghế êm.', 'sofa', '#7C3AED', 'home', 3, 11),
+  w('window', '/ˈwɪndoʊ/', 'cửa sổ', 'an open window', 'Open the window.', 'win · dow', 'Hai tay làm động tác mở cửa sổ.', 'window', '#0EA5E9', 'home', 3, 11),
+  w('garden', '/ˈɡɑːrdən/', 'khu vườn', 'a green garden', 'I play in the garden.', 'gar · den', 'Cúi xuống như đang tưới cây.', 'garden', '#16A34A', 'home', 3, 11),
+
+  // Tuần 12: 12 từ để ôn tích hợp qua nghe, nói và làm.
+  w('open', '/ˈoʊpən/', 'mở', 'open the door', 'I open the door.', 'o · pen', 'Làm động tác mở cửa.', 'open', '#16A34A', 'actions', 3, 12),
+  w('close', '/kloʊz/', 'đóng', 'close the door', 'I close the door.', 'cl · o_e → close', 'Làm động tác đóng cửa.', 'close', '#2563EB', 'actions', 3, 12),
+  w('stand', '/stænd/', 'đứng', 'stand up', 'I can stand up.', 'st · a · nd → stand', 'Đứng lên thật thẳng.', 'stand', '#F97316', 'actions', 3, 12),
+  w('cook', '/kʊk/', 'nấu ăn', 'cook in the kitchen', 'We cook in the kitchen.', 'c · oo · k → cook', 'Giả vờ khuấy một nồi súp.', 'cook', '#DB2777', 'actions', 3, 12),
+  w('kind', '/kaɪnd/', 'tốt bụng', 'a kind friend', 'My friend is kind.', 'k · i_e · nd → kind', 'Đặt tay lên ngực và mỉm cười.', 'kind', '#16A34A', 'feelings', 3, 12),
+  w('funny', '/ˈfʌni/', 'vui tính', 'a funny face', 'My friend is funny.', 'fun · ny', 'Làm một khuôn mặt vui.', 'funny', '#F59E0B', 'feelings', 3, 12),
+  w('sleepy', '/ˈsliːpi/', 'buồn ngủ', 'feel sleepy', 'I am sleepy.', 'sleep + y', 'Ngáp và chụm tay làm gối.', 'sleepy', '#7C3AED', 'feelings', 3, 12),
+  w('well', '/wel/', 'khỏe/tốt', 'feel well', 'I feel well today.', 'w · e · ll → well', 'Giơ ngón tay cái lên.', 'well', '#0EA5E9', 'feelings', 3, 12),
+  w('room', '/ruːm/', 'căn phòng', 'a clean room', 'This is my room.', 'r · oo · m → room', 'Vẽ một hình vuông lớn bằng tay.', 'room', '#2563EB', 'home', 3, 12),
+  w('floor', '/flɔːr/', 'sàn nhà', 'on the floor', 'The ball is on the floor.', 'fl · oor → floor', 'Chỉ xuống sàn nhà.', 'floor', '#92400E', 'home', 3, 12),
+  w('wall', '/wɔːl/', 'bức tường', 'a white wall', 'The wall is white.', 'w · all → wall', 'Đặt hai bàn tay như một bức tường.', 'wall', '#64748B', 'home', 3, 12),
+  w('clock', '/klɑːk/', 'đồng hồ', 'a round clock', 'The clock is on the wall.', 'cl · o · ck → clock', 'Dùng ngón tay vẽ mặt đồng hồ.', 'clock', '#F59E0B', 'home', 3, 12),
+
+  // Tuần 13: từ khóa cho mini-project kể chuyện 2–3 câu.
+  w('friend', '/frend/', 'người bạn', 'my good friend', 'This is my friend.', 'fr · ie · nd → friend', 'Vẫy tay chào một người bạn.', 'friend', '#2563EB', 'family', 4, 13),
+  w('grandma', '/ˈɡrænmɑː/', 'bà', 'my grandma', 'This is my grandma.', 'grand · ma', 'Khoanh tay làm động tác ôm.', 'grandma', '#DB2777', 'family', 4, 13),
+  w('grandpa', '/ˈɡrænpɑː/', 'ông', 'my grandpa', 'This is my grandpa.', 'grand · pa', 'Vẫy tay chào ông.', 'grandpa', '#2563EB', 'family', 4, 13),
+  w('pet', '/pet/', 'thú cưng', 'my little pet', 'This is my pet.', 'p · e · t → pet', 'Giả vờ vuốt ve thú cưng.', 'pet', '#F59E0B', 'animals', 4, 13),
+  w('puppy', '/ˈpʌpi/', 'chó con', 'a playful puppy', 'My puppy can run.', 'pup · py', 'Vẫy bàn tay như chiếc đuôi.', 'puppy', '#B45309', 'animals', 4, 13),
+  w('kitten', '/ˈkɪtən/', 'mèo con', 'a small kitten', 'My kitten is small.', 'kit · ten', 'Làm tai mèo bằng hai bàn tay.', 'kitten', '#F97316', 'animals', 4, 13),
+  w('gold', '/ɡoʊld/', 'màu vàng kim', 'a gold star', 'The star is gold.', 'g · o · ld → gold', 'Chỉ vào một vật óng ánh.', 'color', '#CA8A04', 'colors', 4, 13),
+  w('brown', '/braʊn/', 'màu nâu', 'a brown bear', 'The bear is brown.', 'br · ow · n → brown', 'Tìm và chỉ một vật màu nâu.', 'color', '#92400E', 'colors', 4, 13),
+  w('gray', '/ɡreɪ/', 'màu xám', 'a gray elephant', 'The elephant is gray.', 'gr · ay → gray', 'Tìm và chỉ một vật màu xám.', 'color', '#64748B', 'colors', 4, 13),
+  w('love', '/lʌv/', 'yêu quý', 'love my family', 'I love my family.', 'l · o · ve → love', 'Đặt hai tay lên ngực.', 'love', '#DB2777', 'actions', 4, 13),
+  w('draw', '/drɔː/', 'vẽ', 'draw a picture', 'I can draw a picture.', 'dr · aw → draw', 'Dùng ngón tay vẽ trên không.', 'draw', '#7C3AED', 'actions', 4, 13),
+  w('tell', '/tel/', 'kể/nói', 'tell a story', 'I can tell a story.', 't · e · ll → tell', 'Mở hai tay như một quyển truyện.', 'tell', '#0EA5E9', 'actions', 4, 13),
+]
+
+const weekOverrides: Record<string, number> = {
+  'colors-black': 3,
+  'colors-white': 3,
+  'school-book': 4,
+  'school-pencil': 4,
+  'school-eraser': 4,
+  'school-ruler': 4,
+  'school-desk': 4,
+  'numbers-eleven': 4,
+  'numbers-twelve': 6,
+  'numbers-thirteen': 6,
+  'numbers-fourteen': 6,
+  'numbers-fifteen': 6,
+  'numbers-sixteen': 7,
+  'numbers-seventeen': 7,
+  'numbers-eighteen': 7,
+  'numbers-nineteen': 7,
+  'numbers-twenty': 8,
+}
+
+const baseWords: LearningWord[] = [
   ...phonicsWords,
   ...colorWords,
   ...numberWords,
@@ -198,20 +281,24 @@ export const WORDS: LearningWord[] = [
   ...homeWords,
 ]
 
+export const WORDS: LearningWord[] = [...baseWords, ...paceExpansionWords].map((word) => (
+  weekOverrides[word.id] ? { ...word, week: weekOverrides[word.id] } : word
+))
+
 export const WEEKS: LearningWeek[] = [
   { week: 1, stage: 1, title: 'Âm a, e thật vui', subtitle: 'CVC + đồ dùng gần gũi', goal: 'Nghe và ghép được các từ 3 âm đơn giản.', phonics: 'short a /æ/ · short e /e/', topics: ['phonics', 'school', 'colors'], parentTip: 'Kéo dài từng âm rồi ghép nhanh: c–a–t, cat. Không yêu cầu bé thuộc nghĩa trước.' },
   { week: 2, stage: 1, title: 'Âm i, o, u', subtitle: 'CVC + sắc màu', goal: 'Phân biệt ba nguyên âm ngắn qua từ quen thuộc.', phonics: 'short i /ɪ/ · short o /ɔ/ · short u /ʌ/', topics: ['phonics', 'colors', 'actions'], parentTip: 'Cho bé làm động tác ngay sau khi nghe. Cơ thể giúp trí nhớ giữ từ lâu hơn.' },
-  { week: 3, stage: 1, title: 'Lớp học của con', subtitle: 'Số 1–10 + school things', goal: 'Đếm và gọi tên đồ dùng học tập trong cụm ngắn.', phonics: 'Nhìn chữ đầu và nghe âm đầu', topics: ['numbers', 'school'], parentTip: 'Đếm đồ thật trên bàn học thay vì chỉ nhìn màn hình.' },
-  { week: 4, stage: 1, title: 'Gia đình thân yêu', subtitle: 'Số 11–20 + family', goal: 'Giới thiệu người thân bằng This is my…', phonics: 'Nhịp âm tiết trong từ dài', topics: ['numbers', 'family'], parentTip: 'Dùng ảnh gia đình ở ngoài màn hình và để bé tự chỉ, nói.' },
+  { week: 3, stage: 1, title: 'Con đếm và tìm màu', subtitle: 'Số 1–10 + black & white', goal: 'Đếm từ 1 đến 10 và nhận biết hai màu tương phản.', phonics: 'Nhìn chữ đầu và nghe âm đầu', topics: ['numbers', 'colors'], parentTip: 'Đếm đồ thật quanh nhà rồi tìm một vật màu đen và một vật màu trắng.' },
+  { week: 4, stage: 1, title: 'Gia đình và lớp học', subtitle: 'Family + school things', goal: 'Giới thiệu người thân và gọi tên đồ dùng bằng This is my…', phonics: 'Nhịp âm tiết trong từ dài', topics: ['family', 'school', 'numbers'], parentTip: 'Dùng ảnh gia đình và đồ thật trên bàn học để bé tự chỉ, nói.' },
   { week: 5, stage: 2, title: 'Từ nhỏ mà quan trọng', subtitle: 'Sight words + pets', goal: 'Nhận ra từ chức năng trong câu rất ngắn.', phonics: 'the · is · a · in · on · this · that · have', topics: ['sight-words', 'animals'], parentTip: 'Sight word nên nhận cả hình dạng từ; không ép đánh vần từ bất quy tắc.' },
-  { week: 6, stage: 2, title: 'Thế giới động vật', subtitle: 'Wild animals', goal: 'Miêu tả con vật bằng màu sắc, kích thước và hành động.', phonics: 'Ghép đầu từ với vần quen thuộc', topics: ['animals'], parentTip: 'Hỏi “What can it do?” rồi cho bé làm động tác của con vật.' },
-  { week: 7, stage: 2, title: 'Món con thích', subtitle: 'Food & drinks', goal: 'Dùng I like…, I eat…, I drink…', phonics: 'Âm dài a_e, i_e và ee/ea', topics: ['food'], parentTip: 'Luyện ngay trong bữa ăn với một hoặc hai từ, không biến bữa ăn thành giờ kiểm tra.' },
-  { week: 8, stage: 2, title: 'Cơ thể của con', subtitle: 'Body parts', goal: 'Nghe và phản xạ với Touch your…', phonics: 'Từ số nhiều kết thúc bằng -s', topics: ['body'], parentTip: 'Chơi Simon Says. Bé chỉ làm khi câu bắt đầu bằng “Simon says”.' },
+  { week: 6, stage: 2, title: 'Động vật và số đếm', subtitle: 'Wild animals + 12–15', goal: 'Miêu tả con vật và đếm từ 12 đến 15 trong cụm ngắn.', phonics: 'Ghép đầu từ với vần quen thuộc', topics: ['animals', 'numbers'], parentTip: 'Hỏi “What can it do?” rồi đếm bước chân hoặc động tác của con vật.' },
+  { week: 7, stage: 2, title: 'Món con thích', subtitle: 'Food & drinks + 16–19', goal: 'Dùng I like…, I eat…, I drink… và đếm từ 16 đến 19.', phonics: 'Âm dài a_e, i_e và ee/ea', topics: ['food', 'numbers'], parentTip: 'Luyện một hoặc hai từ trong bữa ăn rồi đếm đồ vật khi chơi, không biến thành giờ kiểm tra.' },
+  { week: 8, stage: 2, title: 'Cơ thể của con', subtitle: 'Body parts + twenty', goal: 'Nghe, phản xạ với Touch your… và nhận biết số 20.', phonics: 'Từ số nhiều kết thúc bằng -s', topics: ['body', 'numbers'], parentTip: 'Chơi Simon Says rồi kết thúc bằng cách cùng đếm đến twenty.' },
   { week: 9, stage: 3, title: 'Con làm được!', subtitle: 'Action verbs', goal: 'Nói I can… và làm đúng hành động.', phonics: 'Cụm phụ âm đầu: sw, sl, dr', topics: ['actions'], parentTip: 'Ưu tiên vận động. Mỗi từ mới phải có ít nhất một lần bé thực hiện thật.' },
   { week: 10, stage: 3, title: 'Hôm nay con thấy sao?', subtitle: 'Feelings', goal: 'Dùng I am… để diễn đạt cảm xúc.', phonics: 'Nhịp hai âm tiết', topics: ['feelings'], parentTip: 'Không sửa cảm xúc của bé; chỉ giúp bé chọn và nói đúng từ.' },
   { week: 11, stage: 3, title: 'Ngôi nhà của con', subtitle: 'Rooms & furniture', goal: 'Nói đồ vật ở đâu bằng in/on.', phonics: 'Từ ghép: bed + room, bath + room', topics: ['home'], parentTip: 'Đi một vòng trong nhà, mỗi phòng chọn tối đa hai từ để gọi tên.' },
   { week: 12, stage: 3, title: 'Thử thách tổng hợp', subtitle: 'Nghe · nói · hành động', goal: 'Kết hợp từ cũ trong câu ngắn và phản xạ tự nhiên.', phonics: 'Ôn các âm bé còn nhầm', topics: ['actions', 'feelings', 'home'], parentTip: 'Chỉ ôn các từ chưa chắc. Từ đã thành thạo dùng trong câu, không hỏi nghĩa rời.' },
-  { week: 13, stage: 4, title: 'Con là người kể chuyện', subtitle: 'Mini-project 2–3 câu', goal: 'Tự tin giới thiệu một bức tranh, thú cưng hoặc gia đình.', phonics: 'Đọc trọn câu theo nhịp', topics: ['family', 'animals', 'colors'], parentTip: 'Cho bé vẽ trên giấy rồi luyện: “This is my… It is… I love…”' },
+  { week: 13, stage: 4, title: 'Con là người kể chuyện', subtitle: 'Mini-project 2–3 câu', goal: 'Tự tin giới thiệu một bức tranh, thú cưng hoặc gia đình.', phonics: 'Đọc trọn câu theo nhịp', topics: ['family', 'animals', 'colors', 'actions'], parentTip: 'Cho bé vẽ trên giấy rồi luyện: “This is my… It is… I love…”' },
 ]
 
 const lessonTemplates: Pick<LearningLesson, 'title' | 'focus' | 'description' | 'kind'>[] = [
@@ -238,7 +325,7 @@ export const LESSONS: LearningLesson[] = WEEKS.flatMap((week) => {
       focus: index === 4 ? 'Mini-project 2–3 câu' : template.focus,
       description: index === 4 ? 'Giới thiệu bức tranh bằng This is…, It is…, I love…' : template.description,
       kind: index === 4 ? 'project' : template.kind,
-      wordIds: takeCycled(pool, index * 5, 6).map((word) => word.id),
+      wordIds: takeCycled(pool, index * 6, 6).map((word) => word.id),
       durationMinutes: 15,
     }))
   }
@@ -294,8 +381,6 @@ export const CATEGORY_LABELS: Record<WordCategory, string> = {
 }
 
 export function wordsForWeek(week: number): LearningWord[] {
-  if (week === 12) return WORDS.filter((word) => word.week >= 9 && word.week <= 11)
-  if (week >= 13) return WORDS.filter((word) => ['family', 'animals', 'colors'].includes(word.category))
   return WORDS.filter((word) => word.week === week)
 }
 

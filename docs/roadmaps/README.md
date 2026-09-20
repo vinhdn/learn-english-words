@@ -6,13 +6,13 @@ Bộ tài liệu này nối tiếp lộ trình nền tảng 13 tuần hiện có
 
 | Chặng | Tuần | Trọng tâm | Mục từ/cụm mới dự kiến |
 |---|---:|---|---:|
-| Nền tảng hiện tại | 1–13 | CVC, từ quen thuộc, sight words, câu ngắn | 109 |
+| Nền tảng hiện tại | 1–13 | CVC, từ quen thuộc, sight words, câu ngắn | 156 |
 | Chặng 2 — Mở rộng thế giới | 14–25 | Trường học, đời sống, tự nhiên, mô tả | 144 |
 | Chặng 3 — Giao tiếp hằng ngày | 26–39 | Cộng đồng, sức khỏe, câu hỏi, kể việc | 168 |
 | Chặng 4 — Đọc và diễn đạt | 40–52 | Phonics nâng cao, đọc hiểu, mini-project | 156 |
-| **Toàn bộ kế hoạch** | **1–52** | **Khoảng một năm học** | **khoảng 577** |
+| **Toàn bộ kế hoạch** | **1–52** | **Khoảng một năm học** | **khoảng 624** |
 
-“577” là số mục từ/cụm trọng tâm trong kế hoạch. Một số từ nền tảng sẽ xuất hiện lại có chủ đích trong câu và nhiệm vụ mới; đây là ôn cách quãng, không phải bắt bé học lại từ đầu.
+“624” là số mục từ/cụm trọng tâm trong kế hoạch. Mỗi tuần có 12 mục; một số từ nền tảng vẫn xuất hiện lại có chủ đích trong câu và nhiệm vụ mới. Đây là ôn cách quãng, không phải bắt bé học lại từ đầu. Các bài đã hoàn thành có thể mở lại bất cứ lúc nào.
 
 ## Cách chia 12 mục từ trong một tuần
 

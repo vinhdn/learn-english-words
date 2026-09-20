@@ -2530,6 +2530,11 @@ svg {
   width: 18px;
 }
 
+.next-lesson-label.replay {
+  background: var(--blue-50);
+  color: var(--color-primary-hover);
+}
+
 .weekly-lesson-list {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

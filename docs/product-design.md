@@ -26,7 +26,8 @@ Giúp một bé lớp 2 đang hổng từ vựng lớp 1 xây lại nền tảng
 
 ## Nguyên tắc học
 
-- 5–6 từ mới mỗi phiên; luôn trộn từ cũ cần ôn.
+- 12 từ trọng tâm mỗi tuần, chia thành hai nhóm 6 từ; mỗi màn học chỉ mở tối đa 6 từ và các buổi sau dùng lại chúng trong câu, nghe, nói, viết.
+- Bài đã hoàn thành luôn có thể mở lại để ôn; học lại tạo thêm lịch sử luyện tập nhưng không làm mất hoặc hạ tiến độ cũ.
 - Học bằng hình, nghe và vận động; không bắt chép lặp lại.
 - Từ luôn đi cùng một cụm và một câu ngắn.
 - Phản hồi sai là “thử lại”, không dùng phạt, mất điểm hay chuỗi ngày gây áp lực.

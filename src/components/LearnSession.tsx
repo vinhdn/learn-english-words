@@ -311,8 +311,8 @@ export function LearnSession({ week, lesson, words, settings, onRecord, onComple
               <div><strong>{correct}/{questions.length}</strong><span>lượt nghe đúng</span></div>
               <div><strong>{Math.max(1, Math.round(elapsed / 60))}</strong><span>phút tập trung</span></div>
             </div>
-            <div className="parent-note"><Lightbulb aria-hidden="true" /><span><strong>Bài tiếp theo đã sẵn sàng:</strong> Về trang chủ để bắt đầu buổi kế tiếp khi con muốn.</span></div>
-            <button className="primary-button large" onClick={onExit} type="button"><ArrowLeft aria-hidden="true" /> Xem bài tiếp theo</button>
+            <div className="parent-note"><Lightbulb aria-hidden="true" /><span><strong>Con luôn có thể học lại:</strong> Về trang chủ để chọn bài tiếp theo hoặc mở lại bất kỳ bài đã học.</span></div>
+            <button className="primary-button large" onClick={onExit} type="button"><ArrowLeft aria-hidden="true" /> Về trang chủ</button>
           </section>
         )}
       </main>
